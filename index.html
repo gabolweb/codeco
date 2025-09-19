@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Codeloop — Maintenance</title>
+  <meta name="description" content="Codeloop is upgrading our AI-driven web ecosystem. We'll be back shortly." />
+  <meta name="theme-color" content="#ff6a00" />
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind via CDN (shadcn-like tokens & aesthetics) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'ui-sans-serif', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'Apple Color Emoji', 'Segoe UI Emoji']
+          },
+          colors: {
+            primary: {
+              DEFAULT: '#ff6a00',
+              50: '#fff1e6',
+              100: '#ffd8bf',
+              200: '#ffb588',
+              300: '#ff934f',
+              400: '#ff7c29',
+              500: '#ff6a00',
+              600: '#db5900',
+              700: '#b34900',
+              800: '#8a3a00',
+              900: '#6c2e00'
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 0 1px rgba(255,255,255,.06), 0 10px 30px rgba(0,0,0,.45), 0 0 40px rgba(255,106,0,.15)',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-14px)' }
+            },
+            blob: {
+              '0%': { transform: 'translate(0px, 0px) scale(1)' },
+              '33%': { transform: 'translate(16px, -12px) scale(1.06)' },
+              '66%': { transform: 'translate(-10px, 10px) scale(0.96)' },
+              '100%': { transform: 'translate(0px, 0px) scale(1)' }
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '0% 50%' },
+              '100%': { backgroundPosition: '200% 50%' }
+            },
+            pulseRing: {
+              '0%': { transform: 'scale(0.9)', opacity: 0.7 },
+              '80%': { transform: 'scale(1.3)', opacity: 0 },
+              '100%': { transform: 'scale(0.9)', opacity: 0 }
+            },
+            type: {
+              '0%': { width: '0ch' },
+              '100%': { width: '32ch' }
+            }
+          },
+          animation: {
+            float: 'float 6s ease-in-out infinite',
+            floatSlow: 'float 9s ease-in-out infinite',
+            blob: 'blob 16s ease-in-out infinite',
+            shimmer: 'shimmer 3.5s linear infinite',
+            pulseRing: 'pulseRing 2.4s ease-out infinite',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* shadcn-like design tokens (HSL for easy theming) */
+    :root {
+      --background: 222 20% 6%;
+      --foreground: 210 20% 98%;
+      --muted: 220 10% 18%;
+      --card: 220 14% 10%;
+      --border: 220 10% 22%;
+      --ring: 24 100% 50%;
+      --primary: 24 100% 50%; /* #ff6a00 */
+      --grid: 0 0% 100% / 6%;
+    }
+    .bg-base { background-color: hsl(var(--background)); }
+    .text-base { color: hsl(var(--foreground)); }
+    .card-surface { background: linear-gradient(180deg, hsl(var(--card) / .9), hsl(var(--card) / .7)); backdrop-filter: blur(10px); }
+    .border-subtle { border-color: hsl(var(--border)); }
+    .muted { color: hsl(var(--foreground) / .65); }
+
+    /* Subtle procedural grid with vignette mask */
+    .grid-vignette {
+      background-image:
+        linear-gradient(to right, hsl(var(--grid)) 1px, transparent 1px),
+        linear-gradient(to bottom, hsl(var(--grid)) 1px, transparent 1px);
+      background-size: 44px 44px;
+      -webkit-mask-image: radial-gradient(1200px 600px at 50% 30%, black 50%, transparent 90%);
+              mask-image: radial-gradient(1200px 600px at 50% 30%, black 50%, transparent 90%);
+    }
+
+    /* Fancy border with animated light sweep */
+    .brilliance {
+      position: relative;
+      overflow: hidden;
+    }
+    .brilliance::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(120deg, rgba(255,255,255,.06), rgba(255,106,0,.35), rgba(255,255,255,.04));
+      -webkit-mask: 
+        linear-gradient(#000 0 0) content-box, 
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      animation: sweep 6s linear infinite;
+      background-size: 200% 200%;
+    }
+    @keyframes sweep {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* Noise for a tactile feel */
+    .noise::after {
+      content:"";
+      position:fixed; inset:0; pointer-events:none;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" opacity="0.05"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+      mix-blend-mode: soft-light;
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .animate, .animation, [class*="animate-"], .brilliance::before { animation: none !important; transition: none !important; }
+    }
+
+    /* Typewriter caret */
+    .caret::after {
+      content: "▍";
+      margin-left: .15rem;
+      display: inline-block;
+      animation: blink 1s steps(1, end) infinite;
+      color: hsl(var(--primary));
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* Smooth hover tilt */
+    .tilt {
+      transform-style: preserve-3d;
+      transform: perspective(1200px) rotateX(0) rotateY(0);
+      transition: transform .6s cubic-bezier(.2,.8,.2,1);
+    }
+    .tilt:hover {
+      transform: perspective(1200px) rotateX(4deg) rotateY(-6deg) translateY(-2px);
+    }
+  </style>
+</head>
+
+<body class="bg-base text-base antialiased overflow-x-hidden selection:bg-primary/20 selection:text-white noise">
+  <!-- Background layers -->
+  <div class="pointer-events-none fixed inset-0 grid-vignette"></div>
+  <div class="pointer-events-none fixed -top-40 -left-40 w-[60vw] h-[60vw] rounded-full blur-3xl opacity-25"
+       style="background: radial-gradient(ellipse at center, rgba(255,106,0,.45), transparent 60%);"></div>
+  <div class="pointer-events-none fixed top-1/3 -right-40 w-[45vw] h-[45vw] rounded-full blur-3xl opacity-20"
+       style="background: radial-gradient(ellipse at center, rgba(255,106,0,.35), transparent 60%);"></div>
+
+  <!-- Header -->
+  <header class="relative z-10">
+    <div class="mx-auto max-w-7xl px-6 py-6 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3 group">
+        <!-- Minimal loop logomark -->
+        <svg width="30" height="30" viewBox="0 0 64 64" class="shrink-0">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffb588"/>
+              <stop offset="100%" stop-color="#ff6a00"/>
+            </linearGradient>
+          </defs>
+          <rect x="6" y="6" width="52" height="52" rx="13" fill="url(#g)" opacity="0.25" />
+          <path d="M22 24c0-4.4 3.6-8 8-8h9c6.6 0 12 5.4 12 12 0 4.8-2.9 9-7 10.9M42 40c0 4.4-3.6 8-8 8h-9c-6.6 0-12-5.4-12-12 0-4.8 2.9-9 7-10.9" stroke="#ff6a00" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span class="text-xl font-semibold tracking-tight">codeloop<span class="text-primary">.co</span></span>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <span class="absolute inline-flex h-full w-full rounded-full animate-pulseRing bg-primary/15"></span>
+          <span class="relative inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm">
+            <span class="size-2 rounded-full bg-primary shadow-[0_0_0_2px_rgba(255,106,0,.35)]"></span>
+            Maintenance mode
+          </span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="relative z-10">
+    <section class="mx-auto max-w-7xl px-6 pb-24 pt-6 lg:pt-10">
+      <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+        <!-- Left: message -->
+        <div class="tilt">
+          <div class="brilliance card-surface border border-subtle rounded-2xl p-8 shadow-glow">
+            <div class="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-sm mb-4">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> Upgrading the platform
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+              We’re building a smarter <span class="text-primary">AI</span> platform
+              for the web <span class="block mt-1 text-2xl md:text-3xl font-semibold"><span id="typewriter" class="caret"></span></span>
+            </h1>
+
+            <p class="mt-5 text-lg muted">
+              Our remote teams and tireless robots are shipping major improvements across our ecosystem.
+              Codeloop will be back online shortly — faster, safer, and more helpful.
+            </p>
+
+            <div class="mt-7 flex flex-col sm:flex-row gap-3">
+              <a href="mailto:hello@codeloop.co" class="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/60 transition">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+                Contact support
+              </a>
+              <a href="#" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-black hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-[0_8px_24px_rgba(255,106,0,.30)]">
+                <i data-lucide="clock" class="w-4 h-4"></i>
+                Status &amp; ETA
+              </a>
+            </div>
+
+            <div class="mt-8 grid sm:grid-cols-[1fr_auto] gap-3">
+              <div class="relative">
+                <input id="email" type="email" placeholder="your@email.com"
+                  class="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/60" />
+                <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <i data-lucide="shield" class="w-4 h-4 text-white/40"></i>
+                </div>
+              </div>
+              <button
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-black hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary/60 transition shadow-[0_8px_24px_rgba(255,106,0,.30)]"
+                onclick="subscribe()">
+                <i data-lucide="send" class="w-4 h-4"></i> Notify me
+              </button>
+            </div>
+
+            <p id="result" class="mt-3 text-sm text-emerald-300/80 hidden">Thanks! We’ll keep you posted.</p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-4 text-xs uppercase tracking-wide text-white/45">
+              <span class="inline-flex items-center gap-2">
+                <i data-lucide="cpu" class="w-3.5 h-3.5"></i> AI-native
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <i data-lucide="globe" class="w-3.5 h-3.5"></i> Web ecosystem
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <i data-lucide="workflow" class="w-3.5 h-3.5"></i> Remote work
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Secure by default
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: animated robots -->
+        <div class="relative">
+          <!-- Orbital ring -->
+          <div class="absolute inset-0 -z-10 blur-xl opacity-50"
+               style="background: radial-gradient(600px 300px at 60% 40%, rgba(255,106,0,.25), transparent 60%);"></div>
+
+          <div class="relative grid gap-6">
+            <!-- Robot 1: Ops bot -->
+            <div class="brilliance card-surface border border-subtle rounded-2xl p-6 shadow-glow animate-float">
+              <div class="flex items-center gap-4">
+                <div class="relative">
+                  <svg width="88" height="88" viewBox="0 0 120 120" class="drop-shadow-[0_10px_20px_rgba(255,106,0,.15)]">
+                    <!-- body -->
+                    <rect x="20" y="28" rx="18" ry="18" width="80" height="70" fill="url(#grad1)"/>
+                    <!-- eyes -->
+                    <circle cx="48" cy="55" r="6" fill="#0b0c10"/>
+                    <circle cx="72" cy="55" r="6" fill="#0b0c10"/>
+                    <circle cx="48" cy="55" r="2.5" fill="#ff6a00">
+                      <animate attributeName="r" values="2.5;1.4;2.5" dur="2.4s" repeatCount="indefinite" />
+                    </circle>
+                    <circle cx="72" cy="55" r="2.5" fill="#ff6a00">
+                      <animate attributeName="r" values="1.4;2.5;1.4" dur="2.4s" repeatCount="indefinite" />
+                    </circle>
+                    <!-- antenna -->
+                    <line x1="60" y1="22" x2="60" y2="28" stroke="#ff6a00" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="60" cy="20" r="4" fill="#ff6a00">
+                      <animate attributeName="opacity" values="1;.35;1" dur="1.8s" repeatCount="indefinite" />
+                    </circle>
+                    <!-- laptop -->
+                    <rect x="36" y="74" width="48" height="24" rx="4" fill="#101215" stroke="#1f2630"/>
+                    <path d="M38 78h44" stroke="#2b3542" />
+                    <circle cx="60" cy="86" r="3" fill="#ff6a00"/>
+                    <defs>
+                      <linearGradient id="grad1" x1="0" x2="1" y1="0" y2="1">
+                        <stop offset="0%" stop-color="#23262d"/>
+                        <stop offset="100%" stop-color="#111316"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-semibold">Ops Bot</h3>
+                  <p class="text-sm muted">Deploying services across the cluster…</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Robot 2: Builder bot -->
+            <div class="brilliance card-surface border border-subtle rounded-2xl p-6 shadow-glow animate-floatSlow">
+              <div class="flex items-center gap-4">
+                <svg width="92" height="92" viewBox="0 0 120 120" class="drop-shadow-[0_10px_20px_rgba(255,106,0,.15)]">
+                  <!-- body -->
+                  <rect x="18" y="32" rx="16" ry="16" width="84" height="62" fill="url(#grad2)"/>
+                  <!-- mouth -->
+                  <rect x="46" y="65" width="28" height="6" rx="3" fill="#0b0c10"/>
+                  <!-- eyes -->
+                  <rect x="38" y="52" width="10" height="8" rx="2" fill="#0b0c10"/>
+                  <rect x="72" y="52" width="10" height="8" rx="2" fill="#0b0c10"/>
+                  <rect x="38" y="52" width="10" height="8" rx="2" fill="#ff6a00">
+                    <animate attributeName="opacity" values="1;.5;1" dur="2s" repeatCount="indefinite"/>
+                  </rect>
+                  <rect x="72" y="52" width="10" height="8" rx="2" fill="#ff6a00">
+                    <animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/>
+                  </rect>
+                  <!-- wrench -->
+                  <path d="M85 86l10 10" stroke="#ff6a00" stroke-width="4" stroke-linecap="round"/>
+                  <circle cx="85" cy="86" r="6" fill="#ff6a00"/>
+                  <defs>
+                    <linearGradient id="grad2" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#1e2127"/>
+                      <stop offset="100%" stop-color="#0f1114"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div>
+                  <h3 class="font-semibold">Builder Bot</h3>
+                  <p class="text-sm muted">Rewiring modules for performance.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Robot 3: Knowledge bot -->
+            <div class="brilliance card-surface border border-subtle rounded-2xl p-6 shadow-glow animate-float">
+              <div class="flex items-center gap-4">
+                <svg width="92" height="92" viewBox="0 0 120 120" class="drop-shadow-[0_10px_20px_rgba(255,106,0,.15)]">
+                  <!-- body -->
+                  <rect x="20" y="28" rx="18" ry="18" width="80" height="70" fill="url(#grad3)"/>
+                  <!-- book -->
+                  <rect x="38" y="68" width="44" height="18" rx="3" fill="#121418" stroke="#222831"/>
+                  <path d="M60 68v18" stroke="#232a33"/>
+                  <!-- eyes -->
+                  <circle cx="50" cy="54" r="4.5" fill="#ff6a00"/>
+                  <circle cx="70" cy="54" r="4.5" fill="#ff6a00"/>
+                  <defs>
+                    <linearGradient id="grad3" x1="0" x2="1" y1="0" y2="1">
+                      <stop offset="0%" stop-color="#242830"/>
+                      <stop offset="100%" stop-color="#121418"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div>
+                  <h3 class="font-semibold">Knowledge Bot</h3>
+                  <p class="text-sm muted">Training on fresh data streams.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- subtle badge -->
+          <div class="mt-6 flex items-center gap-2 text-xs text-white/50">
+            <i data-lucide="sparkle" class="w-4 h-4"></i> Robots at work — please stand by.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-white/5/50">
+      <div class="mx-auto max-w-7xl px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <p class="text-sm muted">&copy; <span id="year"></span> codeloop.co — All rights reserved.</p>
+        <nav class="flex items-center gap-4 text-sm">
+          <a class="hover:text-white transition inline-flex items-center gap-2" href="#"><i data-lucide="github" class="w-4 h-4"></i>GitHub</a>
+          <a class="hover:text-white transition inline-flex items-center gap-2" href="#"><i data-lucide="twitter" class="w-4 h-4"></i>X</a>
+          <a class="hover:text-white transition inline-flex items-center gap-2" href="#"><i data-lucide="rss" class="w-4 h-4"></i>Status</a>
+        </nav>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    // Icons
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide?.createIcons();
+      document.getElementById('year').textContent = new Date().getFullYear();
+    });
+
+    // Friendly demo subscription (no backend)
+    function subscribe() {
+      const input = document.getElementById('email');
+      const res = document.getElementById('result');
+      const value = (input.value || '').trim();
+      if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        input.classList.add('ring-2','ring-red-500/60');
+        setTimeout(() => input.classList.remove('ring-2','ring-red-500/60'), 1200);
+        return;
+      }
+      res.classList.remove('hidden');
+      input.value = '';
+    }
+
+    // Lightweight typewriter (cycles through key themes)
+    const phrases = [
+      'for a resilient web ecosystem.',
+      'that empowers remote teams.',
+      'with human-centered automation.',
+      'built for developers and creators.'
+    ];
+    const el = document.getElementById('typewriter');
+    let idx = 0;
+
+    function typePhrase(text, i = 0) {
+      if (!el) return;
+      el.textContent = text.slice(0, i);
+      if (i < text.length) {
+        setTimeout(() => typePhrase(text, i + 1), 22);
+      } else {
+        setTimeout(() => erasePhrase(text), 1500);
+      }
+    }
+
+    function erasePhrase(text, i = text.length) {
+      if (!el) return;
+      el.textContent = text.slice(0, i);
+      if (i > 0) {
+        setTimeout(() => erasePhrase(text, i - 1), 14);
+      } else {
+        idx = (idx + 1) % phrases.length;
+        setTimeout(() => typePhrase(phrases[idx]), 200);
+      }
+    }
+
+    // Respect reduced motion for typewriter
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reduced) {
+      typePhrase(phrases[idx]);
+    } else if (el) {
+      el.textContent = phrases[0];
+    }
+  </script>
+</body>
+</html>
